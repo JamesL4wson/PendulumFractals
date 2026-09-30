@@ -1,12 +1,11 @@
-// pendulum.cu
-
 //AI generated slop version of PendulumSolver.cpp translated to CUDA
-
 #include <cuda_runtime.h>
 
 #include <cmath>
 #include <stdexcept>
 #include <vector>
+#include <iostream>
+#include <fstream>
 
 constexpr double GRAVITATIONAL_ACCELERATION = 9.81;
 constexpr double PI = 3.1415926535897932384626433832795;
@@ -309,4 +308,16 @@ std::vector<double> compute_divergences(int width, int height, int time, double 
     CUDA_CHECK(cudaFree(d_divergences));
 
     return result;
+}
+
+int main()
+{
+    std::ofstream out("textFile.txt");
+    
+    std::vector<double> divs = compute_divergences(1000, 1000, 30, 0.01);
+
+    for (const auto& i: divs)
+        out << i << "\n";
+
+    return 0;
 }
