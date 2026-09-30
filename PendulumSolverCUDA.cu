@@ -240,7 +240,7 @@ void evolve_pendulums(double* divergences, int screenWidth, int screenHeight, in
 {
     const int index = blockIdx.x * blockDim.x + threadIdx.x;
 
-    const int rows = screenHeight / 2;
+    const int rows = screenHeight;
     const int totalCases = screenWidth * rows;
 
     if (index >= totalCases)
@@ -257,7 +257,7 @@ void evolve_pendulums(double* divergences, int screenWidth, int screenHeight, in
 
     const State initialState = {
         make_double3(angle1, angle2, PI / 2.0),
-        make_double3(0.0, 0.0,0.0)
+        make_double3(0.0, 0.0, 0.0)
     };
 
     State state = initialState;
@@ -275,49 +275,47 @@ void evolve_pendulums(double* divergences, int screenWidth, int screenHeight, in
     divergences[index] = divergence;
 }
 
-#define CUDA_CHECK(call)                                             \
-    do                                                               \
-    {                                                                \
-        cudaError_t err = (call);                                    \
-        if (err != cudaSuccess)                                      \
-        {                                                            \
-            throw std::runtime_error(                               \
-                std::string("CUDA error: ") +                        \
-                cudaGetErrorString(err)                             \
-            );                                                       \
-        }                                                            \
-    } while (0)
+#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
+inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
+{
+   if (code != cudaSuccess) 
+   {
+      fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
+      if (abort) exit(code);
+   }
+}
 
 std::vector<double> compute_divergences(int width, int height, int time, double dt)
 {
     const int totalCases = width * height;
-
+    
     double* d_divergences = nullptr;
-    CUDA_CHECK(cudaMalloc(&d_divergences, totalCases * sizeof(double)));
+    gpuErrchk( cudaMalloc(&d_divergences, totalCases * sizeof(double)) );
     
     constexpr int threadsPerBlock = 256;
     const int blocks = (totalCases + threadsPerBlock - 1) / threadsPerBlock;
     evolve_pendulums<<<blocks, threadsPerBlock>>>(d_divergences, width, height, time, dt);
-    
-    CUDA_CHECK(cudaGetLastError());
-    CUDA_CHECK(cudaDeviceSynchronize());
+
+    gpuErrchk( cudaGetLastError() );
+    gpuErrchk( cudaDeviceSynchronize() );
     
     std::vector<double> result(totalCases);
-    CUDA_CHECK(cudaMemcpy(result.data(), d_divergences, totalCases * sizeof(double), cudaMemcpyDeviceToHost));
+    gpuErrchk( cudaMemcpy(result.data(), d_divergences, totalCases * sizeof(double), cudaMemcpyDeviceToHost) );
 
-    CUDA_CHECK(cudaFree(d_divergences));
-
+    gpuErrchk( cudaFree(d_divergences) );
     return result;
 }
 
 int main()
 {
-    std::ofstream out("textFile.txt");
+    std::ofstream out("3PendulumHighResData.txt");
     
     std::vector<double> divs = compute_divergences(1000, 1000, 30, 0.01);
 
-    for (const auto& i: divs)
-        out << i << "\n";
+    for (int i = 0; i < divs.size(); i++)
+        out << divs[i] << "\n";
+
+    out.close();
 
     return 0;
 }
