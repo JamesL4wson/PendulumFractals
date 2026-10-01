@@ -236,7 +236,7 @@ State rk4_step(const State& state, double dt)
 }
 
 __global__
-void evolve_pendulums(double* divergences, int screenWidth, int screenHeight, int time, double dt)
+void evolve_pendulums(double* divergences, int screenWidth, int screenHeight, double angle3, int time, double dt)
 {
     const int index = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -256,7 +256,7 @@ void evolve_pendulums(double* divergences, int screenWidth, int screenHeight, in
     const double angle2 = y * dy;
 
     const State initialState = {
-        make_double3(angle1, angle2, PI / 2.0),
+        make_double3(angle1, angle2, angle3),
         make_double3(0.0, 0.0, 0.0)
     };
 
@@ -285,7 +285,7 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
    }
 }
 
-std::vector<double> compute_divergences(int width, int height, int time, double dt)
+std::vector<double> compute_divergences(int width, int height, double angle3, int time, double dt)
 {
     const int totalCases = width * height;
     
@@ -294,7 +294,7 @@ std::vector<double> compute_divergences(int width, int height, int time, double 
     
     constexpr int threadsPerBlock = 256;
     const int blocks = (totalCases + threadsPerBlock - 1) / threadsPerBlock;
-    evolve_pendulums<<<blocks, threadsPerBlock>>>(d_divergences, width, height, time, dt);
+    evolve_pendulums<<<blocks, threadsPerBlock>>>(d_divergences, width, height, angle3, time, dt);
 
     gpuErrchk( cudaGetLastError() );
     gpuErrchk( cudaDeviceSynchronize() );
@@ -308,14 +308,21 @@ std::vector<double> compute_divergences(int width, int height, int time, double 
 
 int main()
 {
-    std::ofstream out("3PendulumHighResData.txt");
+    std::ofstream file("3PendulumData.bin");
+
+    for (int j = 0; j < 240; j++)
+    {
+        double angle3 = (j/240.0) * (2*PI) 
+
+        std::vector<double> divs = compute_divergences(1000, 1000, angle3, 30, 0.01);
     
-    std::vector<double> divs = compute_divergences(1000, 1000, 30, 0.01);
+        for (const auto& div : divs)
+        {
+            file.write(reinterpret_cast<char *>(&(float)div), sizeof(div));
+        }
+    }
 
-    for (int i = 0; i < divs.size(); i++)
-        out << divs[i] << "\n";
-
-    out.close();
-
+    file.close();
+    
     return 0;
 }
