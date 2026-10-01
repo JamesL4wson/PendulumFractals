@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-divergencesFile = open("3PendulumHighResData.txt")
+divergencesFile = open("doublePendulumDiv.txt")
 divergences = [float(line.rstrip()) for line in divergencesFile]
 
 divergGrid = np.reshape(divergences, (1000, 1000))
@@ -15,4 +15,4 @@ ax.set_aspect('equal')
 
 plt.imshow(divergGrid, cmap='viridis', vmin=min(divergences), vmax=max(divergences), norm="symlog")
 
-plt.savefig('destination_path.png', format='png', dpi=1000, pad_inches=0)
+plt.savefig('DoublePendulumFractal.png', format='png', dpi=1000, pad_inches=0)
