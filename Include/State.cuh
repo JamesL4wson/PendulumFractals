@@ -57,3 +57,11 @@ inline State operator*(double s, const State& x)
 {
     return x * s;
 }
+
+__device__
+double ErrorBetweenStates(const State& state1, const State& state2)
+{
+    const State diff = state1 - state2;
+    return sqrt(dot3(diff.theta, diff.theta) + dot3(diff.omega, diff.omega));
+}
+

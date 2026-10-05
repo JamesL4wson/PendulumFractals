@@ -2,14 +2,6 @@
 #include "DiffEqSolverCUDA.cuh"
 
 __device__
-double ErrorBetweenStates(const State& state1, const State& state2)
-{
-    const State diff = state1 - state2;
-    return sqrt(dot3(diff.theta, diff.theta) + dot3(diff.omega, diff.omega));
-}
-
-
-__device__
 double GetLyapExp(const State& sEnd, const State& sEndNeighbour)
 {
     const double delStart = sqrt(6 * LYAP_EPSILON * LYAP_EPSILON);
