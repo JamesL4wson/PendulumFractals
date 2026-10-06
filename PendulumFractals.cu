@@ -18,7 +18,7 @@ std::vector<float> CreateColor(double diveregence)
 
     float R = (col2[0] - col1[0]) * diveregence + col1[0];
     float G = (col2[1] - col1[1]) * diveregence + col1[1];
-    float B = (col2[2] - col1[1]) * diveregence + col1[2];
+    float B = (col2[2] - col1[2]) * diveregence + col1[2];
 
     std::vector<float> returnColor = {R, G, B};
 
@@ -41,8 +41,9 @@ void CreateImage(std::vector<double> divergences)
     image.close();
 }
 
-std::vector<double> ComputeDivergences(double angle3)
+std::vector<double> ComputeDivergences()
 {
+    constexpr angle3 = M_PI / 2
     const int totalCases = WIDTH * HEIGHT;
     
     double* divergences = nullptr;
@@ -65,12 +66,10 @@ std::vector<double> ComputeDivergences(double angle3)
 
 int main()
 {
-    double angle3 = PI/2;
-
     std::cout << "Execution started...\n";
     auto start =std::chrono::high_resolution_clock::now();
 
-    std::vector<double> divs = ComputeDivergences(angle3);
+    std::vector<double> divs = ComputeDivergences();
     CreateImage(divs)
 
     auto stop =std::chrono::high_resolution_clock::now();
