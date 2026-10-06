@@ -3,13 +3,22 @@
 
 // ====================================================================
 
+constexpr double masses[]  = {MASSES};
+constexpr double lengths[] = {LENGTHS};
+static_assert(sizeof(masses) / sizeof(masses[0]) == N);
+static_assert(sizeof(lengths) / sizeof(lengths[0]) == N);
+
 __device__
 constexpr Vect DefaultGravityVec()
 {
     Vect g{};
 
     for (int i = 0; i < N; ++i) {
-        g[i] = i * GRAVITATIONAL_ACCELERATION;
+        double sum = 0.0;
+        for (int k = i; k < N; k++) {
+            sum += masses[k]
+        }
+        g[i] = sum * GRAVITATIONAL_ACCELERATION;
     }
 
     return g;
@@ -23,7 +32,11 @@ constexpr Matr DefaultMassMat()
     {
         for (int j = 0; j < N; j++)
         {
-            M[i][j] = max(i, j);
+            double sum = 0.0;
+            for (int k = max(i, j); k < N; k++) {
+                sum += masses[k]
+            }
+            M[i][j] = sum * lengths[j];
         }
     }
 

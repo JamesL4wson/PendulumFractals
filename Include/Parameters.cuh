@@ -4,8 +4,8 @@
 
 #define N 3 //the number of pendulums
 
-#define MASSES
-#define LENGTHS
+#define MASSES 1, 1, 1
+#define LENGTHS 1, 1, 1
 
 #define TIME_STEP_SECONDS 0.01
 #define TOTAL_TIME_SECONDS 30
