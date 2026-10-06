@@ -9,14 +9,14 @@
 #define MASSES 1, 1, 1
 #define LENGTHS 1, 1, 1
 
-#define INITIAL_VELOCITIES 
+#define INITIAL_VELOCITIES 0, 0, 0
 
 // ==============================================
 
 #define TIME_STEP_SECONDS 0.01
 #define TOTAL_TIME_SECONDS 30
 
-#define LYAPUNOV_PRECISION 0.001 //difference of compared initial states
+#define LYAPUNOV_PREC 0.001 //difference of compared initial states
 
 // ==============================================
 

@@ -18,4 +18,8 @@ Now run the compiled .exe. The generator will take hours for accurate/high-resol
 
 The generator is written in CUDA C++ and implements the core differential equation solver on GPU. 
 
-For each pixel in the desired image, the generator will solve the n-compound-pendulum ODE for two similar inital states (differing by some configurable epsilon). It will solve these using the Runge-Kutta-4 algorithm. After the desired number of steps, the Lyapunov exponent of these states will be calculated. The solver will then plot a colour linearly interpolated between (0, 0, 0) and (255, 255, 255) using this exponent. 
+For each pixel in the desired image, the generator will solve the n-compound-pendulum ODE for two similar inital states (differing by some configurable epsilon). It will solve these using the Runge-Kutta-4 algorithm. 
+
+After the desired number of steps, the Lyapunov exponent of these states will be calculated. 
+
+The solver will then plot a colour linearly interpolated between (0, 0, 0) and (255, 255, 255) using this exponent. 

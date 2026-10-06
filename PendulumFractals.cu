@@ -7,7 +7,6 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
-
 #include <chrono>
 
 #include "PendulumSolverCUDA.cuh"
@@ -24,6 +23,22 @@ std::vector<float> CreateColor(double diveregence)
     std::vector<float> returnColor = {R, G, B};
 
     return returnColor;
+}
+
+void CreateImage(std::vector<double> divergences) 
+{
+    pngwriter image(WIDTH, HEIGHT, 1.0, "TestSolver2.png");
+
+    for (int x = 0; x < WIDTH; x++)
+    {
+        for (int y = 0; y < HEIGHT; y++)
+        {
+            std::vector<float> color = CreateColor(divs[x * WIDTH + y]);
+            image.plot(x, y, color[0], color[1], color[2]);
+        }
+    }
+
+    image.close();
 }
 
 std::vector<double> ComputeDivergences(double angle3)
@@ -53,27 +68,12 @@ int main()
     double angle3 = PI/2;
 
     std::cout << "Execution started...\n";
-
     auto start =std::chrono::high_resolution_clock::now();
+
     std::vector<double> divs = ComputeDivergences(angle3);
+    CreateImage(divs)
+
     auto stop =std::chrono::high_resolution_clock::now();
-
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-
     std::cout << "Execution finished\n" << "Time taken:" << duration.count() << "\n";
-
-    pngwriter image(WIDTH, HEIGHT, 1.0, "TestSolver2.png");
-
-    for (int x = 0; x < WIDTH; x++)
-    {
-        for (int y = 0; y < HEIGHT; y++)
-        {
-            std::vector<float> color = CreateColor(divs[x * WIDTH + y]);
-            image.plot(x, y, color[0], color[1], color[2]);
-        }
-    }
-
-    image.close();
-
-    return 0;
 }
