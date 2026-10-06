@@ -1,0 +1,6 @@
+divergences.txt
+.vscode
+data/*
+Images/*
+*.exe
+pngwriter/*
