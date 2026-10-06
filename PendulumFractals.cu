@@ -11,6 +11,8 @@
 
 #include "PendulumSolverCUDA.cuh"
 
+#define PI 3.1415926535897932384626433832795
+
 std::vector<float> CreateColor(double diveregence)
 {
     const int col1[3] = {0,0,0};
@@ -33,7 +35,7 @@ void CreateImage(std::vector<double> divergences)
     {
         for (int y = 0; y < HEIGHT; y++)
         {
-            std::vector<float> color = CreateColor(divs[x * WIDTH + y]);
+            std::vector<float> color = CreateColor(divergences[x * WIDTH + y]);
             image.plot(x, y, color[0], color[1], color[2]);
         }
     }
@@ -43,7 +45,7 @@ void CreateImage(std::vector<double> divergences)
 
 std::vector<double> ComputeDivergences()
 {
-    constexpr angle3 = M_PI / 2
+    constexpr double angle3 = PI / 2;
     const int totalCases = WIDTH * HEIGHT;
     
     double* divergences = nullptr;
@@ -70,9 +72,9 @@ int main()
     auto start =std::chrono::high_resolution_clock::now();
 
     std::vector<double> divs = ComputeDivergences();
-    CreateImage(divs)
+    CreateImage(divs);
 
-    auto stop =std::chrono::high_resolution_clock::now();
+    auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     std::cout << "Execution finished\n" << "Time taken:" << duration.count() << "\n";
 }

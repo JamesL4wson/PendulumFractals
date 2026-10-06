@@ -15,9 +15,6 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 }
 
 __device__
-double ErrorBetweenStates(const State& state1, const State& state2);
-
-__device__
 double GetLyapExp(const State& sEnd, const State& sEndNeighbour);
 
 __global__

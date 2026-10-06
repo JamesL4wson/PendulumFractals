@@ -20,7 +20,7 @@
 
 // ==============================================
 
-#define WIDTH 10000 //horizontal resolution 
-#define HEIGHT 10000 //vertical resolution
+#define WIDTH 1000 //horizontal resolution 
+#define HEIGHT 1000 //vertical resolution
 
 #define FRAMES 1 //number of images to generate

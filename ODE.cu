@@ -1,8 +1,10 @@
 #include "ODE.cuh"
 #include "Parameters.cuh"
 
+__device__
 constexpr double masses[]  = {MASSES};
 static_assert(sizeof(masses) / sizeof(masses[0]) == N);
+__device__
 constexpr double lengths[] = {LENGTHS};
 static_assert(sizeof(lengths) / sizeof(lengths[0]) == N);
 
@@ -14,7 +16,7 @@ constexpr Vect DefaultGravityVec()
     for (int i = 0; i < N; ++i) {
         double sum = 0.0;
         for (int k = i; k < N; k++) {
-            sum += masses[k]
+            sum += masses[k];
         }
         g[i] = sum * GRAVITATIONAL_ACCELERATION;
     }
@@ -32,7 +34,7 @@ constexpr Matr DefaultMassMat()
         {
             double sum = 0.0;
             for (int k = max(i, j); k < N; k++) {
-                sum += masses[k]
+                sum += masses[k];
             }
             M[i][j] = sum * lengths[j];
         }
@@ -60,7 +62,7 @@ Vect GetAccelerationGeneral(const Vect& theta, const Vect& omega)
     // subtract the product C * Omega from the rhs.
     // By noting the symetry of the C matrix, the product can be computed in-place. 
     for (int i = 0; i < N; i++) {
-        for (int j = i + 1; j < N; j++) {
+        for (int j = i+1; j < N; j++) {
             double sinDelta = sin(theta[i] - theta[j]);
             double c = DefaultCoreolisMat()[i][j];
 
@@ -86,7 +88,7 @@ Vect GetAccelerationGeneral(const Vect& theta, const Vect& omega)
 
     // Lz = rhs
     for (int i = 0; i < N; i++) {
-        for (int k = 0; k < i; i++) {
+        for (int k = 0; k < i; k++) {
             rhs[i] -= M[i][k] * rhs[k];
         }
     }
@@ -98,7 +100,7 @@ Vect GetAccelerationGeneral(const Vect& theta, const Vect& omega)
 
     //  L^Tx = rhs
     for (int i = N-1; i >= 0; i--) {
-        for (int k = i+1; k < N; i++) {
+        for (int k = i+1; k < N; k++) {
             rhs[i] -= M[k][i] * rhs[k];
         }
     }
@@ -203,7 +205,17 @@ State ODE(const State& state)
     State step;
 
     step.theta = state.omega;
-    step.omega = GetAcceleration_special3(state.theta, state.omega);
+    step.omega = VectToDouble3(GetAccelerationGeneral(Double3ToVect(state.theta), Double3ToVect(state.omega)));
 
     return step;
+}
+
+__device__
+double3 VectToDouble3(Vect vect) {
+    return make_double3(vect[0], vect[1], vect[2]);
+}
+
+__device__
+Vect Double3ToVect(double3 dub3) {
+    return {dub3.x, dub3.y, dub3.z};
 }

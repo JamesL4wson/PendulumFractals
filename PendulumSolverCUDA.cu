@@ -7,7 +7,7 @@
 __device__
 double GetLyapExp(const State& sEnd, const State& sEndNeighbour)
 {
-    constexpr double delStart = sqrt(6 * LYAPUNOV_PREC * LYAPUNOV_PREC);
+    const double delStart = sqrt(6 * LYAPUNOV_PREC * LYAPUNOV_PREC);
     const double delEnd = ErrorBetweenStates(sEnd, sEndNeighbour);
 
     return 1.0/10 * log(delEnd / delStart);
