@@ -1,11 +1,9 @@
 #include "ODE.cuh"
 #include "Parameters.cuh"
 
-// ====================================================================
-
 constexpr double masses[]  = {MASSES};
-constexpr double lengths[] = {LENGTHS};
 static_assert(sizeof(masses) / sizeof(masses[0]) == N);
+constexpr double lengths[] = {LENGTHS};
 static_assert(sizeof(lengths) / sizeof(lengths[0]) == N);
 
 __device__
@@ -52,9 +50,7 @@ constexpr Matr DefaultCoreolisMat()
 __device__
 Vect GetAccelerationGeneral(const Vect& theta, const Vect& omega)
 {
-    // =====================================================
-    // --------------- Create the rhs vector ---------------
-    // =====================================================
+    // =============== Create the rhs vector ===============
 
     Vect rhs = DefaultGravityVec();
     for (int i = 0; i < N; i++) {
@@ -73,9 +69,7 @@ Vect GetAccelerationGeneral(const Vect& theta, const Vect& omega)
         }
     }
 
-    // =====================================================
-    // ------- Create and decompose the mass matrix -------- 
-    // =====================================================
+    // ======= Create and decompose the mass matrix ======== 
 
     Matr M = DefaultMassMat();
     for (int i = 0; i < N; i++) {
@@ -88,9 +82,7 @@ Vect GetAccelerationGeneral(const Vect& theta, const Vect& omega)
     Vect D; // D is diagonal matrix, only diagonals stored
     LDLTDecomp(M, D);   // decomposes M in-place, M is now its lower diagonal factor L
 
-    // =====================================================
-    // -------------- Solve for acceleration ---------------
-    // =====================================================
+    // ============== Solve for acceleration ==============
 
     // Lz = rhs
     for (int i = 0; i < N; i++) {
