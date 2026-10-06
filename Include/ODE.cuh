@@ -3,8 +3,6 @@
 
 #include "State.cuh"
 
-#define GRAVITATIONAL_ACCELERATION 9.81
-
 // Implements a specialized version of the LDLT decomposition to solve for the acceleration vector
 // of an N compound pendulum. Writen for CUDA, but also more or less valid C++ code.
 //

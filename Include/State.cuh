@@ -1,8 +1,8 @@
 #pragma once
 
-#define N 3
-
 #include <cuda_runtime.h>
+
+#include "Parameters.cuh"
 
 typedef cuda::std::array<double, N> Vect;
 typedef cuda::std::array<cuda::std::array<double, N>, N> Matr;
