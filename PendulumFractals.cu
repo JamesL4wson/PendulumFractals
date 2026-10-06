@@ -53,7 +53,7 @@ std::vector<double> ComputeDivergences()
     
     constexpr int threadsPerBlock = 256;
     const int blocks = (totalCases + threadsPerBlock - 1) / threadsPerBlock;
-    SolvePendulum_kernal<<<blocks, threadsPerBlock>>>(divergences, angle3);
+    SolvePendulum_kernal<<<blocks, threadsPerBlock>>>(divergences);
 
     gpuErrchk( cudaGetLastError() );
     gpuErrchk( cudaDeviceSynchronize() );

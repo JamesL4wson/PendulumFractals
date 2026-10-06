@@ -18,4 +18,7 @@ __device__
 double GetLyapExp(const State& sEnd, const State& sEndNeighbour);
 
 __global__
-void SolvePendulum_kernal(double* divergences, double angle3);
+void SolvePendulum_kernal(double* divergences);
+
+__device__
+void GetAngleSpacePos(Vect& angles, const int index);

@@ -9,48 +9,57 @@ typedef cuda::std::array<double, N> Vect;
 typedef cuda::std::array<cuda::std::array<double, N>, N> Matr;
 
 __host__ __device__
-inline double3 add3(const double3& a, const double3& b)
+inline Vect add(const Vect& a, const Vect& b)
 {
-    return make_double3(a.x + b.x, a.y + b.y, a.z + b.z);
+    Vect result{};
+    for (int i = 0; i < N; ++i)
+        result[i] = a[i] + b[i];
+    return result;
 }
-
 __host__ __device__
-inline double3 sub3(const double3& a, const double3& b)
+inline Vect sub(const Vect& a, const Vect& b)
 {
-    return make_double3(a.x - b.x, a.y - b.y, a.z - b.z);
+    Vect result{};
+    for (int i = 0; i < N; ++i)
+        result[i] = a[i] - b[i];
+    return result;
 }
-
 __host__ __device__
-inline double3 scale3(const double3& a, double s)
+inline Vect scale(const Vect& a, double s)
 {
-    return make_double3(a.x * s, a.y * s, a.z * s);
+    Vect result{};
+    for (int i = 0; i < N; ++i)
+        result[i] = a[i] * s;
+    return result;
 }
-
 __host__ __device__
-inline double dot3(const double3& a, const double3& b)
+inline double dot(const Vect& a, const Vect& b)
 {
-    return a.x * b.x + a.y * b.y + a.z * b.z;
+    double result = 0.0;
+    for (int i = 0; i < N; ++i)
+        result += a[i] * b[i];
+    return result;
 }
 
 struct State
 {
-    double3 theta;
-    double3 omega;
+    Vect theta;
+    Vect omega;
 
     __host__ __device__
     inline State operator+(const State& s) const
     {
-        return {add3(theta, s.theta), add3(omega, s.omega)};
+        return {add(theta, s.theta), add(omega, s.omega)};
     }
     __host__ __device__
     inline State operator-(const State& s) const
     {
-        return {sub3(theta, s.theta), sub3(omega, s.omega)};
+        return {sub(theta, s.theta), sub(omega, s.omega)};
     }
     __host__ __device__
     inline State operator*(double s) const
     {
-        return {scale3(theta, s), scale3(omega, s)};
+        return {scale(theta, s), scale(omega, s)};
     }
 };
 __host__ __device__
@@ -63,6 +72,6 @@ __device__
 inline double ErrorBetweenStates(const State& state1, const State& state2)
 {
     const State diff = state1 - state2;
-    return sqrt(dot3(diff.theta, diff.theta) + dot3(diff.omega, diff.omega));
+    return sqrt(dot(diff.theta, diff.theta) + dot(diff.omega, diff.omega));
 }
 

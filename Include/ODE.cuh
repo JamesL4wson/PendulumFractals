@@ -18,8 +18,3 @@ __device__
 double3 GetAcceleration_special3(const double3& theta, const double3& omega);
 __device__
 State ODE(const State& state);
-
-__device__
-Vect Double3ToVect(double3 dub3);
-__device__
-double3 VectToDouble3(Vect vect);

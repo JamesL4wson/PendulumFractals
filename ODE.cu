@@ -205,17 +205,7 @@ State ODE(const State& state)
     State step;
 
     step.theta = state.omega;
-    step.omega = VectToDouble3(GetAccelerationGeneral(Double3ToVect(state.theta), Double3ToVect(state.omega)));
+    step.omega = GetAccelerationGeneral(state.theta, state.omega);
 
     return step;
-}
-
-__device__
-double3 VectToDouble3(Vect vect) {
-    return make_double3(vect[0], vect[1], vect[2]);
-}
-
-__device__
-Vect Double3ToVect(double3 dub3) {
-    return {dub3.x, dub3.y, dub3.z};
 }
