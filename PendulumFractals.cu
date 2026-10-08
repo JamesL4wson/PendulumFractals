@@ -45,7 +45,6 @@ void CreateImage(std::vector<double> divergences)
 
 std::vector<double> ComputeDivergences()
 {
-    constexpr double angle3 = PI / 2;
     const int totalCases = WIDTH * HEIGHT;
     
     double* divergences = nullptr;

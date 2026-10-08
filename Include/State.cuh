@@ -75,3 +75,14 @@ inline double ErrorBetweenStates(const State& state1, const State& state2)
     return sqrt(dot(diff.theta, diff.theta) + dot(diff.omega, diff.omega));
 }
 
+__device__
+inline State axpy(const State& rhs, const State& lhs, double s)
+{
+    State result{};
+    for (int i = 0; i < N; i++)
+    {
+        result.theta[i] = rhs.theta[i] + s * lhs.theta[i];
+        result.omega[i] = rhs.omega[i] + s * lhs.omega[i];
+    }
+    return result;
+}

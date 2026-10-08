@@ -82,14 +82,15 @@ Vect GetAccelerationGeneral(const Vect& theta, const Vect& omega)
     }
 
     Vect D; // D is diagonal matrix, only diagonals stored
-    LDLTDecomp(M, D);   // decomposes M in-place, M is now its lower diagonal factor L
+    Matr L;
+    LDLTDecomp(M, D, L);   // decomposes M in-place, M is now its lower diagonal factor L
 
     // ============== Solve for acceleration ==============
 
     // Lz = rhs
     for (int i = 0; i < N; i++) {
-        for (int k = 0; k < i; k++) {
-            rhs[i] -= M[i][k] * rhs[k];
+        for (int k = 0; k < i-1; k++) {
+            rhs[i] -= L[i][k] * rhs[k];
         }
     }
 
@@ -101,7 +102,7 @@ Vect GetAccelerationGeneral(const Vect& theta, const Vect& omega)
     //  L^Tx = rhs
     for (int i = N-1; i >= 0; i--) {
         for (int k = i+1; k < N; k++) {
-            rhs[i] -= M[k][i] * rhs[k];
+            rhs[i] -= L[k][i] * rhs[k];
         }
     }
 
@@ -109,63 +110,71 @@ Vect GetAccelerationGeneral(const Vect& theta, const Vect& omega)
 }
 
 __device__
-void LDLTDecomp(Matr& M, Vect& D) 
+void LDLTDecomp(Matr& M, Vect& D, Matr& L) 
 {
-    Cholesky_inPlace(M); // reusing M for efficiency, M <-> L
+    Cholesky_inPlace(M, L);
 
     for (int i = 0; i < N; i++) {
-		D[i] = M[i][i] * M[i][i];
+		D[i] = L[i][i] * L[i][i];
 
-        const double inv = 1.0 / M[i][i];
+        const double inv = 1.0 / L[i][i];
 
         for (int j = i; j < N; j++) {
-            M[j][i] *= inv;
+            L[j][i] *= inv;
         }
     }
 }
+
 __device__
-void Cholesky_inPlace(Matr& M)
+void Cholesky_inPlace(Matr& M, Matr& L)
 {
     for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
+        for (int j = 0; j < i; j++) {
             double sum = 0.0;
             for (int k = 0; k < j; k++) {
                 sum += M[i][k] * M[j][k];
             }
-            
-            M[i][j] = (M[i][j] - sum) / M[j][j];
+
+            L[i][j] = (M[i][j] - sum) / M[j][j];
         }
+
+        // j == i case
+        double sum = 0.0;
+        for (int k = 0; k < i; k++) {
+            sum += M[i][k] * M[i][k];
+        }
+        L[i][i] = sqrt(M[i][i] - sum);
     }
 }
 
 // ====================================================================
 
 __device__
-double3 GetAcceleration_special3(const double3& theta, const double3& omega)
+Vect GetAcceleration_special3(const Vect& theta, const Vect& omega)
 {   
     // ------- compute RHS -------
 
-    const double sinXY = sin(theta.x - theta.y);
-    const double sinXZ = sin(theta.x - theta.z);
-    const double sinYZ = sin(theta.y - theta.z);
+    const double sinXY = sin(theta[0] - theta[1]);
+    const double sinXZ = sin(theta[0] - theta[2]);
+    const double sinYZ = sin(theta[1] - theta[2]);
 
     //compute C * omega
-    const double row1 = 2 * omega.y * omega.y * sinXY + omega.z * omega.z * sinXZ;
-    const double row2 = 2 * omega.x * omega.x * -sinXY + omega.z * omega.z * sinYZ;
-    const double row3 = omega.x * omega.x * -sinXZ + omega.y * omega.y * -sinYZ;
+    const double row1 = 2 * omega[1] * omega[1] * sinXY + omega[2] * omega[2] * sinXZ;
+    const double row2 = 2 * omega[0] * omega[0] * -sinXY + omega[2] * omega[2] * sinYZ;
+    const double row3 = omega[0] * omega[0] * -sinXZ + omega[1] * omega[1] * -sinYZ;
 
     //subtract G
     double rhs[3] = {
-        -row1 - 3 * sin(theta.x) * GRAVITATIONAL_ACCELERATION, 
-        -row2 - 2 * sin(theta.y) * GRAVITATIONAL_ACCELERATION,
-        -row3 -     sin(theta.z) * GRAVITATIONAL_ACCELERATION
+        -row1 - 3 * sin(theta[0]) * GRAVITATIONAL_ACCELERATION, 
+        -row2 - 2 * sin(theta[1]) * GRAVITATIONAL_ACCELERATION,
+        -row3 -     sin(theta[2]) * GRAVITATIONAL_ACCELERATION
     };
 
     // ------- M inverse -------
 
-    const double A = 2.0 * cos(theta.x - theta.y);
-    const double B = cos(theta.x - theta.z);
-    const double C = cos(theta.y - theta.z);
+    const double A = 2.0 * cos(theta[0] - theta[1]);
+    const double B = cos(theta[0] - theta[2]);
+    const double C = cos(theta[1] - theta[2]);
     
     const double invDet = 1.0 / (6.0 - A*A - 2.0*B*B - 3.0*C*C + 2.0*A*B*C);
 
@@ -188,11 +197,11 @@ double3 GetAcceleration_special3(const double3& theta, const double3& omega)
 
     // ------- M^-1 * RHS -------
 
-    double3 acceleration;
+    Vect acceleration;
 
-    acceleration.x = rhs[0] * invM[0][0] + rhs[1] * invM[1][0] + rhs[2] * invM[2][0];
-    acceleration.y = rhs[0] * invM[0][1] + rhs[1] * invM[1][1] + rhs[2] * invM[2][1];
-    acceleration.z = rhs[0] * invM[0][2] + rhs[1] * invM[1][2] + rhs[2] * invM[2][2];
+    acceleration[0] = rhs[0] * invM[0][0] + rhs[1] * invM[1][0] + rhs[2] * invM[2][0];
+    acceleration[1] = rhs[0] * invM[0][1] + rhs[1] * invM[1][1] + rhs[2] * invM[2][1];
+    acceleration[2] = rhs[0] * invM[0][2] + rhs[1] * invM[1][2] + rhs[2] * invM[2][2];
 
     return acceleration;
 }

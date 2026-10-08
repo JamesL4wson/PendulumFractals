@@ -4,16 +4,14 @@
 #define TOLERANCE 0.001
 
 __device__
-State RK4Step(const State& state, double dt)
+void RK4Step(State& state, double dt)
 {
     const State k1 = ODE( state );
-    const State k2 = ODE( state + dt * 0.5 * k1 );
-    const State k3 = ODE( state + dt * 0.5 * k2 );
-    const State k4 = ODE( state + dt * k3 );
+    const State k2 = ODE( axpy(state, k1, dt * 0.5) );
+    const State k3 = ODE( axpy(state, k2, dt * 0.5) );
+    const State k4 = ODE( axpy(state, k3, dt) );
 
-    State newState = state + dt/6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
-
-    return newState;
+    state = axpy(state, (axpy(axpy(k1, k2, 2), k3, 2.0) + k4), dt/6.0);
 }
 
 __device__

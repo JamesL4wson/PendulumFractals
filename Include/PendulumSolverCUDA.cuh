@@ -21,4 +21,4 @@ __global__
 void SolvePendulum_kernal(double* divergences);
 
 __device__
-void GetAngleSpacePos(Vect& angles, const int index);
+Vect GetAngleSpacePos(const int index);
