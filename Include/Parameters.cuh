@@ -4,12 +4,12 @@
 
 // ==============================================
 
-#define N 3 //the number of pendulums
+#define N 4 //the number of pendulums
 
-#define MASSES 1, 1, 1
-#define LENGTHS 1, 1, 1
+#define MASSES 1.0, 1.0, 1.0, 1.0
+#define LENGTHS 1.0, 1.0, 1.0, 1.0
 
-#define INITIAL_VELOCITIES 0, 0, 0
+#define INITIAL_VELOCITIES 0, 0, 0, 0
 
 // ==============================================
 
@@ -20,7 +20,12 @@
 
 // ==============================================
 
-#define WIDTH 1000 //horizontal resolution 
-#define HEIGHT 1000 //vertical resolution
+#define WIDTH 10000 //horizontal resolution 
+#define HEIGHT 10000 //vertical resolution
 
 #define FRAMES 1 //number of images to generate
+
+// ==============================================
+
+#define MIN_ANGLE -PI/2
+#define MAX_ANGLE PI/2

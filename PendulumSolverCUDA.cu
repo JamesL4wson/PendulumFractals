@@ -52,19 +52,17 @@ void SolvePendulum_kernal(double* divergences)
 __device__
 Vect GetAngleSpacePos(const int index) 
 {
-    constexpr double minAngle = -PI/2;
-    constexpr double maxAngle = PI/2;
-
-    constexpr double dx = (maxAngle - minAngle) / static_cast<double>(WIDTH);
-    constexpr double dy = (maxAngle - minAngle) / static_cast<double>(HEIGHT);
+    constexpr double dx = (MAX_ANGLE - MIN_ANGLE) / static_cast<double>(WIDTH);
+    constexpr double dy = (MAX_ANGLE - MIN_ANGLE) / static_cast<double>(HEIGHT);
 
     const int x = index / HEIGHT;
     const int y = index % HEIGHT;
 
     Vect angles = {
-        x * dx + minAngle,
-        y * dy + minAngle,
-        PI / 2
+        x * dx + MIN_ANGLE,
+        y * dy + MIN_ANGLE,
+        0,
+        PI / 2 
     };
 
     return angles;
