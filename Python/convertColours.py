@@ -4,8 +4,8 @@ from PIL import Image
 
 # =====================================================
 
-oldImageName = 'TestSolver2.png'
-newImageName = 'newName.png'
+oldImageName = 'QuadPendulumFractal.png'
+newImageName = 'QuadPendulumFracral(colour).png'
 colorMap = 'bone'
 
 compress = False

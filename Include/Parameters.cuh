@@ -14,7 +14,7 @@
 // ==============================================
 
 #define TIME_STEP_SECONDS 0.01
-#define TOTAL_TIME_SECONDS 30
+#define TOTAL_TIME_SECONDS 30.0
 
 #define LYAPUNOV_PREC 0.001 //difference of compared initial states
 
