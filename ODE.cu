@@ -83,7 +83,7 @@ Vect GetAccelerationGeneral(const Vect& theta, const Vect& omega)
 
     Vect D; // D is diagonal matrix, only diagonals stored
     Matr L;
-    LDLTDecomp(M, D, L);   // decomposes M in-place, M is now its lower diagonal factor L
+    LDLTDecomp(M, D, L);
 
     // ============== Solve for acceleration ==============
 
@@ -102,7 +102,7 @@ Vect GetAccelerationGeneral(const Vect& theta, const Vect& omega)
     //  L^Tx = rhs
     for (int i = N-1; i >= 0; i--) {
         for (int k = i+1; k < N; k++) {
-            rhs[i] -= L[k][i] * rhs[k];
+            rhs[i] -= L[i][k] * rhs[k]; //swap i <-> k 
         }
     }
 
@@ -110,9 +110,9 @@ Vect GetAccelerationGeneral(const Vect& theta, const Vect& omega)
 }
 
 __device__
-void LDLTDecomp(Matr& M, Vect& D, Matr& L) 
+void LDLTDecomp(const Matr& M, const Vect& D, const Matr& L) 
 {
-    Cholesky_inPlace(M, L);
+    Cholesky(M, L);
 
     for (int i = 0; i < N; i++) {
 		D[i] = L[i][i] * L[i][i];
@@ -126,7 +126,7 @@ void LDLTDecomp(Matr& M, Vect& D, Matr& L)
 }
 
 __device__
-void Cholesky_inPlace(Matr& M, Matr& L)
+void Cholesky(const Matr& M, const Matr& L)
 {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < i; j++) {
@@ -138,7 +138,7 @@ void Cholesky_inPlace(Matr& M, Matr& L)
             L[i][j] = (M[i][j] - sum) / M[j][j];
         }
 
-        // j == i case
+        // i == j case
         double sum = 0.0;
         for (int k = 0; k < i; k++) {
             sum += M[i][k] * M[i][k];
