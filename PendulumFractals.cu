@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <chrono>
+#include <iomanip>
 
 #include "PendulumSolverCUDA.cuh"
 
@@ -76,4 +77,112 @@ int main()
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     std::cout << "Execution finished\n" << "Time taken:" << duration.count() << "\n";
+}
+
+
+
+
+
+
+constexpr std::size_t OUTPUT_WIDTH = 100;
+constexpr std::size_t RULE_WIDTH   = 58;
+
+std::string formatFloat(double value)
+{
+    std::ostringstream out;
+    out << std::fixed << std::setprecision(6) << value;
+    return out.str();
+}
+
+template <typename Range>
+std::string formatFloats(const Range& values)
+{
+    std::ostringstream out;
+    out << '[';
+
+    bool first = true;
+    for (const auto& value : values)
+    {
+        if (!first)
+            out << ", ";
+
+        out << std::fixed << std::setprecision(6) << value;
+        first = false;
+    }
+
+    out << ']';
+    return out.str();
+}
+
+void printField(const std::string& label, const std::string& value)
+{
+    const std::size_t used = label.size() + 1 + value.size();
+
+    const std::size_t dotCount =
+        (used < OUTPUT_WIDTH) ? OUTPUT_WIDTH - used : 1;
+
+    std::cout << label << ' '
+              << std::string(dotCount, '.')
+              << value << '\n';
+}
+
+void printRule()
+{
+    std::cout << std::string(RULE_WIDTH, '-') << '\n';
+}
+
+void PrintSolverOutput()
+{
+    constexpr double timePerStep = 0.000000007555555556;
+    constexpr double predictedRuntime = (timePerStep 
+        * N 
+        * WIDTH * HEIGHT 
+        * TIME_STEP_SECONDS * TIME_STEP_SECONDS
+    );
+
+    constexpr double currentTime = 0;
+    constexpr double startTime = 0; 
+
+    printRule();
+    std::cout << "=============== Running Solver ================\n";
+    printRule();
+
+    std::cout << "Outputting to filename: " << "TestSolver2.png" << "\n\n";
+
+    std::cout << "Execution Began: "
+              << formatFloat(startTime) << '\n';
+
+    std::cout << "Up Time: "
+              << formatFloat(currentTime - startTime) << "\n\n";
+
+    std::cout << "Estimated Required Runtime: "
+              << formatFloat(predictedRuntime) << '\n';
+
+    std::cout << "Estimated Remaining Runtime: "
+              << formatFloat(predictedRuntime - currentTime) << "\n\n";
+
+    printRule();
+    std::cout << "================= Parameters =================\n";
+    printRule();
+    std::cout << '\n';
+
+    printField("N",                       formatFloat(N));
+    printField("Masses",                  formatFloats(MASSES));
+    printField("Lengths",                 formatFloats(LENGTHS));
+    printField("Initial Velocities",      formatFloats(INITIAL_VELOCITIES));
+
+    std::cout << '\n';
+
+    printField("Horizontal Resolution",   formatFloat(WIDTH));
+    printField("Vertical Resolution",     formatFloat(HEIGHT));
+    printField("Frames",                  formatFloat(FRAMES));
+
+    std::cout << '\n';
+
+    printField("RK4 Step-size (s)",       formatFloat(STEP_SIZE_SECONDS));
+    printField("Iteration Time (s)",      formatFloat(TOTAL_TIME_SECONDS));
+
+    std::cout << '\n';
+
+    printField("Lyapunov Precision",      formatFloat(LYAPUNOV_PREC));
 }
