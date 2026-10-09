@@ -18,7 +18,7 @@ constexpr Vect DefaultGravityVec()
         for (int k = i; k < N; k++) {
             sum += masses[k];
         }
-        g[i] = sum * GRAVITATIONAL_ACCELERATION;
+        g[i] = -sum * GRAVITATIONAL_ACCELERATION;
     }
 
     return g;
@@ -81,15 +81,15 @@ Vect GetAccelerationGeneral(const Vect& theta, const Vect& omega)
         }
     }
 
-    Vect D; // D is diagonal matrix, only diagonals stored
-    Matr L;
+    Vect D{}; // D is diagonal matrix, only diagonals stored
+    Matr L{};
     LDLTDecomp(M, D, L);
 
     // ============== Solve for acceleration ==============
 
     // Lz = rhs
     for (int i = 0; i < N; i++) {
-        for (int k = 0; k < i-1; k++) {
+        for (int k = 0; k < i; k++) {
             rhs[i] -= L[i][k] * rhs[k];
         }
     }
@@ -102,7 +102,7 @@ Vect GetAccelerationGeneral(const Vect& theta, const Vect& omega)
     //  L^Tx = rhs
     for (int i = N-1; i >= 0; i--) {
         for (int k = i+1; k < N; k++) {
-            rhs[i] -= L[i][k] * rhs[k]; //swap i <-> k 
+            rhs[i] -= L[k][i] * rhs[k];
         }
     }
 
@@ -110,7 +110,7 @@ Vect GetAccelerationGeneral(const Vect& theta, const Vect& omega)
 }
 
 __device__
-void LDLTDecomp(const Matr& M, const Vect& D, const Matr& L) 
+void LDLTDecomp(const Matr& M, Vect& D, Matr& L) 
 {
     Cholesky(M, L);
 
@@ -126,22 +126,22 @@ void LDLTDecomp(const Matr& M, const Vect& D, const Matr& L)
 }
 
 __device__
-void Cholesky(const Matr& M, const Matr& L)
+void Cholesky(const Matr& M, Matr& L)
 {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < i; j++) {
             double sum = 0.0;
             for (int k = 0; k < j; k++) {
-                sum += M[i][k] * M[j][k];
+                sum += L[i][k] * L[j][k];
             }
 
-            L[i][j] = (M[i][j] - sum) / M[j][j];
+            L[i][j] = (M[i][j] - sum) / L[j][j];
         }
 
         // i == j case
         double sum = 0.0;
         for (int k = 0; k < i; k++) {
-            sum += M[i][k] * M[i][k];
+            sum += L[i][k] * L[i][k];
         }
         L[i][i] = sqrt(M[i][i] - sum);
     }

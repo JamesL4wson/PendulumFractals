@@ -10,9 +10,9 @@
 __device__
 Vect GetAccelerationGeneral(const Vect& theta, const Vect& omega);
 __device__
-void LDLTDecomp(const Matr& M, const Vect& D, const Matr& L);
+void LDLTDecomp(const Matr& M, Vect& D, Matr& L);
 __device__
-void Cholesky(const Matr& M, const Matr& L);
+void Cholesky(const Matr& M, Matr& L);
 // Specialises the pendulum ODE to 3 pendulums
 __device__
 Vect GetAcceleration_special3(const Vect& theta, const Vect& omega);

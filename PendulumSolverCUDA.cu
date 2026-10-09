@@ -20,7 +20,7 @@ double GetLyapExp(const State& sEnd, const State& sEndNeighbour)
     const double delStart = sqrt(3 * LYAPUNOV_PREC * LYAPUNOV_PREC);
     const double delEnd = ErrorBetweenStates(sEnd, sEndNeighbour);
 
-    return 1.0/TOTAL_TIME_SECONDS * log(delEnd / delStart);
+    return 3.0/TOTAL_TIME_SECONDS * log(delEnd / delStart);
 }
 
 __global__
@@ -52,15 +52,18 @@ void SolvePendulum_kernal(double* divergences)
 __device__
 Vect GetAngleSpacePos(const int index) 
 {
-    constexpr double dx = 2.0 * PI / static_cast<double>(WIDTH);
-    constexpr double dy = 2.0 * PI / static_cast<double>(HEIGHT);
+    constexpr double minAngle = -PI/2;
+    constexpr double maxAngle = PI/2;
+
+    constexpr double dx = (maxAngle - minAngle) / static_cast<double>(WIDTH);
+    constexpr double dy = (maxAngle - minAngle) / static_cast<double>(HEIGHT);
 
     const int x = index / HEIGHT;
     const int y = index % HEIGHT;
 
     Vect angles = {
-        x * dx - PI,
-        y * dy - PI,
+        x * dx + minAngle,
+        y * dy + minAngle,
         PI / 2
     };
 

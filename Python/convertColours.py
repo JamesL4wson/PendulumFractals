@@ -4,7 +4,7 @@ from PIL import Image
 
 # =====================================================
 
-oldImageName = 'name.png'
+oldImageName = 'TestSolver2.png'
 newImageName = 'newName.png'
 colorMap = 'bone'
 
@@ -25,9 +25,11 @@ plt.axis('off')
 ax.set_position([0, 0, 1, 1], which='both')
 ax.set_aspect('equal')
 
-plt.imshow(pixelColors, cmap=colorMap)
+plt.imshow(-pixelColors, cmap=colorMap)
 
-plt.savefig(newImageName, format='png', dpi=10000, pad_inches=0)
+plt.savefig(newImageName, format='png', dpi=im.size[0], pad_inches=0)
+
+print(max(pixelColors[0]))
 
 # =====================================================
 if (compress):

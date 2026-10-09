@@ -27,9 +27,9 @@ std::vector<float> CreateColor(double diveregence)
     return returnColor;
 }
 
-void CreateImage(std::vector<double> divergences, std::string imageName) 
+void CreateImage(std::vector<double> divergences) 
 {
-    pngwriter image(WIDTH, HEIGHT, 1.0, imageName);
+    pngwriter image(WIDTH, HEIGHT, 1.0, "TestSolver2.png");
 
     for (int x = 0; x < WIDTH; x++)
     {
@@ -67,11 +67,11 @@ std::vector<double> ComputeDivergences()
 
 int main()
 {
-    std::cout << "Execution started...\n" << ;
+    std::cout << "Execution started...\n";
     auto start =std::chrono::high_resolution_clock::now();
 
     std::vector<double> divs = ComputeDivergences();
-    CreateImage(divs, "TestSolver2.png");
+    CreateImage(divs);
 
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
