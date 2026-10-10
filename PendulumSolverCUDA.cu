@@ -60,9 +60,7 @@ Vect GetAngleSpacePos(const int index)
 
     Vect angles = {
         x * dx + MIN_ANGLE,
-        y * dy + MIN_ANGLE,
-        0,
-        PI / 2 
+        y * dy + MIN_ANGLE
     };
 
     return angles;

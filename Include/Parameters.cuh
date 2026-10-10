@@ -4,12 +4,12 @@
 
 // ==============================================
 
-#define N 4 //the number of pendulums
+#define N 2 //the number of pendulums
 
-#define MASSES 1.0, 1.0, 1.0, 1.0
-#define LENGTHS 1.0, 1.0, 1.0, 1.0
+#define MASSES 1.0, 1.0
+#define LENGTHS 1.0, 1.0
 
-#define INITIAL_VELOCITIES 0, 0, 0, 0
+#define INITIAL_VELOCITIES 0, 0
 
 // ==============================================
 
@@ -27,5 +27,5 @@
 
 // ==============================================
 
-#define MIN_ANGLE -PI/2
-#define MAX_ANGLE PI/2
+#define MIN_ANGLE -PI
+#define MAX_ANGLE PI

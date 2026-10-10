@@ -10,7 +10,7 @@
 #include <thread>
 
 #include "PendulumSolverCUDA.cuh"
-#include "Output.h"
+#include "Output.cuh"
 
 #define PI 3.1415926535897932384626433832795
 
@@ -30,7 +30,7 @@ std::vector<float> CreateColor(double diveregence)
 
 void CreateImage(std::vector<double>& divergences) 
 {
-    pngwriter image(WIDTH, HEIGHT, 1.0, "QuadPendulumFractal.png");
+    pngwriter image(WIDTH, HEIGHT, 1.0, "DoublePendulumFractal.png");
 
     for (int x = 0; x < WIDTH; x++)
     {
